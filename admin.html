@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Administrativo — Megaport Serviços</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="images/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- ============ TELA DE LOGIN ============ -->
+<div class="login-screen" id="login-screen">
+  <div class="login-card">
+    <img src="images/logo.png" alt="Megaport Serviços">
+    <h1>Painel Administrativo</h1>
+    <p class="subtitle">Adicione serviços e cupons de promoção do site.</p>
+    <div class="error-msg" id="login-error">E-mail ou senha incorretos.</div>
+    <form id="login-form">
+      <div class="field">
+        <label for="login-email">E-mail</label>
+        <input type="email" id="login-email" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="login-password">Senha</label>
+        <input type="password" id="login-password" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="login-submit-btn">Entrar</button>
+    </form>
+    <div class="login-security-note">
+      Login de verdade, com conta protegida pelo Supabase — as mesmas credenciais que você criou no
+      painel do Supabase (Authentication → Users). Ninguém mais consegue editar o site sem essa conta.
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAINEL (após login) ============ -->
+<div class="dashboard" id="dashboard">
+
+  <header class="admin-header">
+    <div class="brand">
+      <img src="images/logo.png" alt="Megaport Serviços">
+      <div>
+        <strong>Painel Administrativo</strong>
+        <span>Megaport Serviços</span>
+      </div>
+    </div>
+    <div class="admin-header-actions">
+      <a class="btn btn-ghost btn-sm" href="index.html" target="_blank" rel="noopener">Ver site</a>
+      <button class="btn btn-ghost btn-sm" id="logout-btn">Sair</button>
+    </div>
+  </header>
+
+  <div class="publish-banner">
+    <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+    <span><strong>Tudo em tempo real:</strong> qualquer alteração salva aqui aparece imediatamente para todos os visitantes do site — não precisa baixar nem subir nenhum arquivo.</span>
+  </div>
+
+  <nav class="admin-tabs">
+    <button class="admin-tab-btn active" data-tab="servicos">Serviços</button>
+    <button class="admin-tab-btn" data-tab="cupons">Cupons</button>
+    <button class="admin-tab-btn" data-tab="seguranca">Segurança</button>
+  </nav>
+
+  <main class="admin-main">
+
+    <!-- ---- TAB: SERVIÇOS ---- -->
+    <section class="admin-panel active" id="panel-servicos">
+      <div class="panel-head">
+        <div>
+          <h2>Serviços</h2>
+          <p>Esses são os cards que aparecem na seção "Serviços" do site.</p>
+        </div>
+        <button class="btn btn-primary btn-sm" id="add-service-btn">+ Adicionar serviço</button>
+      </div>
+      <div class="item-list" id="services-list"></div>
+    </section>
+
+    <!-- ---- TAB: CUPONS ---- -->
+    <section class="admin-panel" id="panel-cupons">
+      <div class="panel-head">
+        <div>
+          <h2>Cupons e promoções</h2>
+          <p>Cupons marcados como "ativo" (e dentro da validade) aparecem numa seção especial do site. Se não houver nenhum ativo, a seção fica oculta.</p>
+        </div>
+        <button class="btn btn-primary btn-sm" id="add-coupon-btn">+ Adicionar cupom</button>
+      </div>
+      <div class="item-list" id="coupons-list"></div>
+    </section>
+
+    <!-- ---- TAB: SEGURANÇA ---- -->
+    <section class="admin-panel" id="panel-seguranca">
+      <div class="panel-head">
+        <div>
+          <h2>Segurança</h2>
+          <p>Troque a senha da sua conta de administrador.</p>
+        </div>
+      </div>
+      <div class="security-card">
+        <h3>Trocar senha</h3>
+        <p>Vale para qualquer lugar que você acesse o painel — é a senha real da sua conta no Supabase.</p>
+        <div class="error-msg" id="password-error"></div>
+        <div class="field">
+          <label for="current-password">Senha atual</label>
+          <input type="password" id="current-password" autocomplete="current-password">
+        </div>
+        <div class="field">
+          <label for="new-password">Nova senha</label>
+          <input type="password" id="new-password" autocomplete="new-password">
+        </div>
+        <div class="field">
+          <label for="confirm-password">Confirmar nova senha</label>
+          <input type="password" id="confirm-password" autocomplete="new-password">
+        </div>
+        <button class="btn btn-primary" id="change-password-btn">Salvar nova senha</button>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="action-bar">
+    <span class="action-bar-status" id="action-status"></span>
+  </div>
+
+</div>
+
+<!-- ============ MODAL: FORMULÁRIO DE SERVIÇO ============ -->
+<div class="modal-overlay" id="service-modal">
+  <div class="modal-box">
+    <h3 id="service-modal-title">Adicionar serviço</h3>
+    <form id="service-form">
+      <input type="hidden" id="service-id">
+      <div class="field">
+        <label for="service-title">Título</label>
+        <input type="text" id="service-title" required maxlength="60">
+      </div>
+      <div class="field">
+        <label for="service-description">Descrição</label>
+        <textarea id="service-description" required maxlength="220"></textarea>
+      </div>
+      <div class="field">
+        <label>Ícone</label>
+        <div class="icon-picker" id="icon-picker"></div>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="service-featured">
+        <label for="service-featured">Destacar este serviço (aparece maior, com selo)</label>
+      </div>
+      <div class="field conditional-field" id="badge-field">
+        <label for="service-badge">Texto do selo</label>
+        <input type="text" id="service-badge" maxlength="20" placeholder="Destaque">
+      </div>
+      <div class="field">
+        <label for="service-link-type">Ao clicar no botão, o serviço deve...</label>
+        <select id="service-link-type">
+          <option value="whatsapp">Abrir o WhatsApp com uma mensagem</option>
+          <option value="anchor">Rolar até outra seção do site</option>
+          <option value="url">Abrir um link externo</option>
+        </select>
+      </div>
+      <div class="field conditional-field" id="link-whatsapp-field">
+        <label for="service-link-whatsapp">Mensagem do WhatsApp</label>
+        <textarea id="service-link-whatsapp" maxlength="200">Olá! Vi o site da Megaport e gostaria de pedir um orçamento.</textarea>
+      </div>
+      <div class="field conditional-field" id="link-anchor-field">
+        <label for="service-link-anchor">Seção do site (ex: #pombos, #contato)</label>
+        <input type="text" id="service-link-anchor" placeholder="#servicos">
+      </div>
+      <div class="field conditional-field" id="link-url-field">
+        <label for="service-link-url">Endereço do link</label>
+        <input type="text" id="service-link-url" placeholder="https://">
+      </div>
+      <div class="field">
+        <label for="service-link-label">Texto do botão</label>
+        <input type="text" id="service-link-label" maxlength="30" placeholder="Pedir orçamento">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="service-cancel-btn">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar serviço</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MODAL: FORMULÁRIO DE CUPOM ============ -->
+<div class="modal-overlay" id="coupon-modal">
+  <div class="modal-box">
+    <h3 id="coupon-modal-title">Adicionar cupom</h3>
+    <form id="coupon-form">
+      <input type="hidden" id="coupon-id">
+      <div class="field">
+        <label for="coupon-title">Título</label>
+        <input type="text" id="coupon-title" required maxlength="60" placeholder="Ex: 10% de desconto na primeira limpeza">
+      </div>
+      <div class="field">
+        <label for="coupon-code">Código do cupom</label>
+        <input type="text" id="coupon-code" required maxlength="30" placeholder="Ex: PRIMEIRA10" style="text-transform:uppercase">
+      </div>
+      <div class="field">
+        <label for="coupon-description">Descrição (opcional)</label>
+        <textarea id="coupon-description" maxlength="200" placeholder="Explique a condição da promoção"></textarea>
+      </div>
+      <div class="field">
+        <label for="coupon-valid-until">Válido até (opcional — deixe em branco para não expirar)</label>
+        <input type="date" id="coupon-valid-until">
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="coupon-active">
+        <label for="coupon-active">Cupom ativo (visível no site)</label>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="coupon-cancel-btn">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar cupom</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="js/vendor/supabase.js"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
