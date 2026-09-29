@@ -48,6 +48,10 @@ mainNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
    alteração feita no painel admin fica visível aqui na hora, para
    qualquer visitante — sem precisar publicar nenhum arquivo. */
 async function loadContent() {
+  // Sem Supabase configurado, o site usa o conteúdo escrito no index.html.
+  if (typeof supabaseClient === 'undefined' || !supabaseClient) {
+    return { services: [], coupons: [], loadError: false };
+  }
   try {
     const [servicesRes, couponsRes] = await Promise.all([
       supabaseClient.from('services').select('*').order('sort_order', { ascending: true }),
@@ -70,7 +74,6 @@ function whatsappLink(message) {
 
 function serviceCardHTML(service) {
   const featuredClass = service.featured ? ' featured' : '';
-  const linkClass = service.link_type === 'whatsapp' ? ' service-link-whatsapp' : '';
   const badge = service.featured && service.badge
     ? `<span class="service-badge">${escapeHTML(service.badge)}</span>`
     : '';
@@ -87,6 +90,18 @@ function serviceCardHTML(service) {
   }
   const linkLabel = service.link_label || 'Pedir orçamento';
 
+  // O botão do card: verde do WhatsApp quando leva pra conversa, gradiente
+  // da marca quando é um link interno (ex: "Saber mais" → seção de pombos).
+  // Mantém o mesmo visual dos cards escritos no index.html.
+  const isWhatsapp = service.link_type === 'whatsapp';
+  const ctaClass = isWhatsapp ? 'btn btn-primary btn-whatsapp service-cta' : 'btn btn-primary service-cta';
+  const ctaIcon = isWhatsapp
+    ? '<svg viewBox="0 0 24 24" class="icon-wa"><path fill-rule="evenodd" d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.3A10 10 0 1 0 12 2zM8.4 8.1c.2-.5.7-.6 1-.5l.6.2c.3.1.5.4.4.7-.1.5-.3.9-.1 1.4.4 1 1.5 2 2.5 2.4.5.2.8-.1 1.3-.2.3-.1.6 0 .7.3l.3.6c.1.3.1.7-.4 1-1 .5-2.1.4-3.4-.4-1.4-1-2.4-2.2-2.8-3.2-.2-.6-.2-1.5-.1-2.3z"/></svg>'
+    : '';
+  const ctaArrow = isWhatsapp
+    ? ''
+    : ' <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+
   return `
     <div class="service-card${featuredClass}">
       ${badge}
@@ -95,19 +110,23 @@ function serviceCardHTML(service) {
       </div>
       <h3>${escapeHTML(service.title)}</h3>
       <p>${escapeHTML(service.description)}</p>
-      <a class="service-link${linkClass}" href="${href}"${target}${rel}>${escapeHTML(linkLabel)} <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="${ctaClass}" href="${href}"${target}${rel}>${ctaIcon}${escapeHTML(linkLabel)}${ctaArrow}</a>
     </div>`;
 }
 
 function renderServices(services, loadError) {
   const grid = document.getElementById('services-grid');
   if (!grid) return;
-  if (loadError) {
-    grid.innerHTML = '<p style="color:var(--ink-400);">Não foi possível carregar os serviços agora. Tente recarregar a página em instantes.</p>';
-    return;
-  }
-  if (!services || services.length === 0) {
-    grid.innerHTML = '<p style="color:var(--ink-400);">Nenhum serviço cadastrado no momento.</p>';
+
+  // O index.html já vem com os serviços padrão escritos no HTML. Só
+  // substituímos esses cards quando o banco realmente devolveu serviços.
+  // Assim, se o Supabase não estiver configurado, estiver fora do ar ou
+  // com a lista vazia, o visitante continua vendo os serviços do site em
+  // vez de uma mensagem de erro ou uma seção vazia.
+  if (loadError || !services || services.length === 0) {
+    if (loadError) {
+      console.warn('Serviços do banco indisponíveis — mantendo os serviços padrão do HTML.');
+    }
     return;
   }
   grid.innerHTML = services.map(serviceCardHTML).join('');

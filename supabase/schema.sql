@@ -114,13 +114,19 @@ create policy "coupons_write_admin"
 
 
 -- ============ DADOS INICIAIS (os mesmos que já existiam no site) ============
+-- Estes são os mesmos 9 serviços que já estão escritos no index.html.
+-- Depois de rodar este arquivo, o site passa a ler a lista daqui — e o
+-- dono pode editar, reordenar ou acrescentar serviços pelo painel admin.
 insert into public.services (icon, title, description, featured, badge, link_type, link_value, link_label, sort_order) values
-('pombos', 'Controle de Pombos', 'Afastamos pombos de forma discreta e definitiva, sem agredir o ambiente nem a estética do local. 1ª autorizada Bird Control do Rio Grande do Sul.', true, 'Destaque', 'anchor', '#pombos', 'Saber mais', 1),
-('zeladoria', 'Zeladoria', 'Portaria, controle de acesso e cuidado diário com o seu espaço, do jeito que ele precisa.', false, '', 'whatsapp', 'Olá! Vi o site da Megaport e gostaria de pedir um orçamento.', 'Pedir orçamento', 2),
-('limpeza', 'Limpeza', 'Limpeza de áreas comuns, comerciais e residenciais, com rotina e padrão combinados com você.', false, '', 'whatsapp', 'Olá! Vi o site da Megaport e gostaria de pedir um orçamento.', 'Pedir orçamento', 3),
-('manutencao', 'Manutenção', 'Reparos e manutenção preventiva pra evitar que um problema pequeno vire um grande.', false, '', 'whatsapp', 'Olá! Vi o site da Megaport e gostaria de pedir um orçamento.', 'Pedir orçamento', 4),
-('jardinagem', 'Jardinagem', 'Poda, conservação e cuidado das áreas verdes, pra manter tudo bonito o ano inteiro.', false, '', 'whatsapp', 'Olá! Vi o site da Megaport e gostaria de pedir um orçamento.', 'Pedir orçamento', 5),
-('especiais', 'Serviços Especiais', 'Demandas pontuais e projetos fora da rotina, com a mesma agilidade de sempre.', false, '', 'whatsapp', 'Olá! Vi o site da Megaport e gostaria de pedir um orçamento.', 'Pedir orçamento', 6)
+('pombos', 'Controle de Pombos', 'Afastamos pombos de forma discreta e definitiva, sem machucar as aves nem alterar a estética do local. 1ª autorizada Bird Control do Rio Grande do Sul.', true, 'Destaque', 'anchor', '#pombos', 'Saber mais', 1),
+('zeladoria', 'Zeladoria', 'Cuidado diário com o seu prédio: rotina organizada, pequenos reparos e acompanhamento de tudo que precisa de atenção.', false, '', 'whatsapp', 'Olá! Vi o site da Megaport e quero um orçamento de zeladoria.', 'Pedir orçamento', 2),
+('escudo', 'Portaria', 'Controle de acesso com equipe treinada, presença constante e registro de quem entra e sai do seu espaço.', false, '', 'whatsapp', 'Olá! Vi o site da Megaport e quero um orçamento de portaria.', 'Pedir orçamento', 3),
+('recepcao', 'Recepção', 'Atendimento na entrada da sua empresa: recebe visitantes, encaminha e organiza o fluxo do dia com educação.', false, '', 'whatsapp', 'Olá! Vi o site da Megaport e quero um orçamento de recepção.', 'Pedir orçamento', 4),
+('limpeza', 'Limpeza', 'Limpeza de áreas comuns, comerciais e residenciais, com rotina e padrão combinados com você.', false, '', 'whatsapp', 'Olá! Vi o site da Megaport e quero um orçamento de limpeza.', 'Pedir orçamento', 5),
+('manutencao', 'Manutenção Predial', 'Reparos e manutenção preventiva pra evitar que um problema pequeno vire um problema grande.', false, '', 'whatsapp', 'Olá! Vi o site da Megaport e quero um orçamento de manutenção predial.', 'Pedir orçamento', 6),
+('jardinagem', 'Jardinagem', 'Poda, conservação e cuidado das áreas verdes, pra manter tudo bonito o ano inteiro.', false, '', 'whatsapp', 'Olá! Vi o site da Megaport e quero um orçamento de jardinagem.', 'Pedir orçamento', 7),
+('risco', 'Análise de Risco', 'Avaliação do seu espaço pra identificar vulnerabilidades de segurança e apontar o que precisa ser corrigido.', false, '', 'whatsapp', 'Olá! Vi o site da Megaport e quero falar sobre análise de risco.', 'Pedir orçamento', 8),
+('administrativo', 'Assistente Administrativo', 'Apoio nas rotinas de escritório: organização de documentos, planilhas e as tarefas do dia a dia que ninguém tem tempo de fazer.', false, '', 'whatsapp', 'Olá! Vi o site da Megaport e quero falar sobre assistente administrativo.', 'Pedir orçamento', 9)
 on conflict do nothing;
 
 insert into public.coupons (title, code, description, valid_until, active) values

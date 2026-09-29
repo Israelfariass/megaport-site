@@ -19,4 +19,18 @@
 const SUPABASE_URL = 'COLE_AQUI_A_URL_DO_SEU_PROJETO';
 const SUPABASE_ANON_KEY = 'COLE_AQUI_A_ANON_KEY_DO_SEU_PROJETO';
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Enquanto os dois valores acima não forem preenchidos, não tentamos
+// conectar: o site continua funcionando normalmente com os serviços
+// escritos no index.html, sem erro nenhum no navegador. Assim que você
+// colar a URL e a chave de verdade, a conexão passa a valer e o site
+// lê os serviços/cupons do banco (editáveis pelo painel admin).
+const SUPABASE_CONFIGURADO = /^https:\/\/.+\.supabase\.co\/?$/.test(SUPABASE_URL)
+  && SUPABASE_ANON_KEY.length > 30;
+
+const supabaseClient = SUPABASE_CONFIGURADO
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+
+if (!SUPABASE_CONFIGURADO) {
+  console.info('Megaport: Supabase ainda não configurado (veja SETUP.md). O site está usando os serviços escritos no index.html.');
+}

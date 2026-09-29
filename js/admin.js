@@ -27,9 +27,21 @@ function showLogin() {
   loginScreen.style.display = 'flex';
 }
 
+// O painel só funciona com o Supabase configurado (js/supabase-config.js).
+// Enquanto isso não for feito, mostramos um aviso claro no lugar de deixar
+// o login falhar sem explicação.
+if (!supabaseClient) {
+  loginError.textContent = 'O banco de dados ainda não foi configurado. Siga o passo a passo do arquivo SETUP.md para conectar o Supabase e liberar o painel.';
+  loginError.classList.add('visible');
+  loginSubmitBtn.disabled = true;
+  loginSubmitBtn.style.opacity = '.55';
+  loginSubmitBtn.style.cursor = 'not-allowed';
+}
+
 // Verifica se já existe uma sessão válida (fica conectado entre visitas,
 // até fazer logout ou a sessão expirar).
 (async () => {
+  if (!supabaseClient) return;
   const { data } = await supabaseClient.auth.getSession();
   if (data.session) {
     await showDashboard();
@@ -37,7 +49,7 @@ function showLogin() {
 })();
 
 // Se a sessão cair (token expirado, logout em outra aba, etc.), volta pro login.
-supabaseClient.auth.onAuthStateChange((event) => {
+supabaseClient?.auth.onAuthStateChange((event) => {
   if (event === 'SIGNED_OUT') showLogin();
 });
 

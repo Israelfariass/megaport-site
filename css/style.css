@@ -9,8 +9,8 @@
     --teal-300:#7fcad9;
     --blue-600:#1672c4;
     --blue-500:#1a8ad9;
-    --whatsapp-green:#25d366;
-    --whatsapp-green-dark:#1da851;
+    --whatsapp-green:#157f45;
+    --whatsapp-green-dark:#11693a;
     --ice-50:#f3f8fa;
     --ice-100:#e7f0f3;
     --white:#ffffff;
@@ -121,8 +121,8 @@
     box-shadow:0 10px 24px rgba(0,110,160,.28);
   }
   .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 14px 30px rgba(8, 231, 75, 0.507); }
-  .btn-whatsapp{ background:var(--whatsapp-green); box-shadow:0 10px 24px rgba(37,211,102,.28); }
-  .btn-whatsapp:hover{ background:var(--whatsapp-green-dark); box-shadow:0 14px 30px rgba(37,211,102,.36); }
+  .btn-whatsapp{ background:var(--whatsapp-green); box-shadow:0 8px 20px rgba(9,74,42,.30); }
+  .btn-whatsapp:hover{ background:var(--whatsapp-green-dark); box-shadow:0 12px 26px rgba(9,74,42,.38); }
   .btn-ghost{
     background:transparent;
     color:var(--white);
@@ -161,7 +161,42 @@
     align-items:center;
     gap:11px;
   }
+  /* ===== Logo do cabeçalho: brilho que atravessa, como no vídeo da marca ===== */
+  .brand-logo{
+    position:relative;
+    display:block;
+    width:77px; height:77px;
+    border-radius:50%;
+    overflow:hidden;
+    flex-shrink:0;
+    /* entrada suave ao carregar a página */
+    animation:logo-in .7s cubic-bezier(.2,.7,.3,1) both;
+  }
   .brand img{ width:77px; height:77px; border-radius:50%; }
+  /* A faixa de luz: começa fora da logo, cruza na diagonal e some. */
+  .brand-logo::after{
+    content:"";
+    position:absolute;
+    top:-40%; left:-60%;
+    width:45%; height:180%;
+    background:linear-gradient(90deg,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,.65) 50%,
+      rgba(255,255,255,0) 100%);
+    transform:rotate(14deg) translateX(0);
+    animation:logo-shine 7s ease-in-out 1.2s infinite;
+    pointer-events:none;
+  }
+  @keyframes logo-in{
+    from{ opacity:0; transform:scale(.8); }
+    to{ opacity:1; transform:scale(1); }
+  }
+  @keyframes logo-shine{
+    0%     { transform:rotate(14deg) translateX(0);     opacity:0; }
+    6%     { opacity:1; }
+    22%    { transform:rotate(14deg) translateX(320%);  opacity:0; }
+    100%   { transform:rotate(14deg) translateX(320%);  opacity:0; }
+  }
   .brand-text{ display:flex; flex-direction:column; line-height:1.15; }
   .brand-text strong{
     font-family:'Space Grotesk',sans-serif;
@@ -331,7 +366,9 @@
     align-items:center;
     justify-content:center;
   }
-  .hero-visual svg{ width:100%; height:100%; max-width:460px; }
+  /* z-index para a marca ficar ACIMA do halo (.hero-glow é absoluto e,
+     sem isso, era pintado por cima, deixando o branco das ondas azulado). */
+  .hero-visual svg{ width:100%; height:100%; max-width:460px; position:relative; z-index:1; }
   .hero-glow{
     position:absolute;
     width:380px; height:380px;
@@ -348,6 +385,37 @@
     50%{ transform:translateX(7px); }
     100%{ transform:translateX(0); }
   }
+  /* ===== Marca do hero (o logo real da empresa, em vetor) =====
+     Entrada: a marca surge do escuro; as ondas sobem logo depois.
+     Depois disso, a cada 7s uma faixa de luz atravessa a face,
+     como o reflexo no fim do vídeo institucional. */
+  .hero-mark .mark-body{
+    opacity:0;
+    animation:mark-appear 1.1s cubic-bezier(.2,.7,.3,1) .2s forwards;
+  }
+  .hero-mark .mark-waves{
+    opacity:0;
+    animation:mark-rise 1s cubic-bezier(.2,.7,.3,1) .75s forwards;
+  }
+  .hero-mark .shine-band{
+    animation:hex-sweep 7s ease-in-out 1.9s infinite;
+  }
+  .hero-mark{ overflow:visible; }
+  @keyframes mark-appear{
+    from{ opacity:0; }
+    to  { opacity:1; }
+  }
+  @keyframes mark-rise{
+    from{ opacity:0; transform:translateY(16px); }
+    to  { opacity:1; transform:translateY(0); }
+  }
+  @keyframes hex-sweep{
+    0%   { transform:translateX(0);    opacity:0; }
+    4%   { opacity:1; }
+    26%  { transform:translateX(560px); opacity:0; }
+    100% { transform:translateX(560px); opacity:0; }
+  }
+
   .float-group{ animation:drift 6s ease-in-out infinite; }
   .wave-line-1{ animation:wave-shift 5s ease-in-out infinite; }
   .wave-line-2{ animation:wave-shift 5s ease-in-out infinite .4s; }
@@ -431,6 +499,8 @@
     border-radius:var(--radius-lg);
     padding:30px 26px;
     position:relative;
+    display:flex;
+    flex-direction:column;
     transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
     overflow:hidden;
   }
@@ -473,6 +543,26 @@
   .service-card.featured .service-link-whatsapp{ color:var(--whatsapp-green); }
   .service-link svg{ width:15px; height:15px; transition:transform .18s ease; }
   .service-card:hover .service-link svg{ transform:translateX(3px); }
+
+  /* Botão de ação dentro do card de serviço: fica sempre grudado na base
+     do card, para que todos os botões da linha se alinhem entre si. */
+  .service-cta{
+    margin-top:auto;
+    align-self:flex-start;
+    padding:11px 20px;
+    font-size:0.9rem;
+    /* Sem sombra colorida aqui: nove botões brilhando lado a lado pesa
+       demais. A sombra fica reservada para os CTAs grandes (topo, hero,
+       contato). Aqui o destaque vem da própria cor do botão. */
+    box-shadow:none;
+  }
+  .service-cta:hover{ box-shadow:none; }
+  .service-cta svg{ width:17px; height:17px; }
+  .service-card:hover .service-cta svg:not(.icon-wa){ transform:translateX(2px); }
+  .service-cta svg:not(.icon-wa){ transition:transform .18s ease; }
+  @media (max-width:600px){
+    .service-cta{ align-self:stretch; width:100%; }
+  }
 
   @media (max-width:920px){ .services-grid{ grid-template-columns:repeat(2,1fr); } }
   @media (max-width:600px){ .services-grid{ grid-template-columns:1fr; } }
@@ -798,11 +888,11 @@
     border-radius:50%;
     background:var(--whatsapp-green);
     display:flex; align-items:center; justify-content:center;
-    box-shadow:0 10px 28px rgba(37,211,102,.4);
+    box-shadow:0 8px 22px rgba(9,74,42,.42);
     z-index:999;
     transition:transform .2s ease, box-shadow .2s ease;
   }
-  .fab-whatsapp:hover{ transform:scale(1.08); background:var(--whatsapp-green-dark); box-shadow:0 14px 34px rgba(37,211,102,.5); }
+  .fab-whatsapp:hover{ transform:scale(1.08); background:var(--whatsapp-green-dark); box-shadow:0 12px 28px rgba(9,74,42,.5); }
   .fab-whatsapp svg{ width:28px; height:28px; fill:#fff; }
   @media (max-width:600px){
     .fab-whatsapp{ width:54px; height:54px; bottom:18px; right:18px; }
@@ -895,4 +985,11 @@
     html{ scroll-behavior:auto; }
     [data-reveal]{ opacity:1; transform:none; transition:none; }
     .float-group, .wave-line-1, .wave-line-2, .wave-line-3{ animation:none; }
+    /* Marca e logo ficam no estado final, sem movimento nenhum. */
+    .brand-logo{ animation:none; }
+    .brand-logo::after{ animation:none; opacity:0; }
+    .hero-mark .mark-body,
+    .hero-mark .mark-waves{ animation:none; opacity:1; transform:none; }
+    .hero-mark .shine-band{ animation:none; }
+    .hero-mark .hex-shine{ display:none; }
   }
