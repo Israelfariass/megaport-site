@@ -70,6 +70,7 @@ function whatsappLink(message) {
 
 function serviceCardHTML(service) {
   const featuredClass = service.featured ? ' featured' : '';
+  const linkClass = service.link_type === 'whatsapp' ? ' service-link-whatsapp' : '';
   const badge = service.featured && service.badge
     ? `<span class="service-badge">${escapeHTML(service.badge)}</span>`
     : '';
@@ -94,7 +95,7 @@ function serviceCardHTML(service) {
       </div>
       <h3>${escapeHTML(service.title)}</h3>
       <p>${escapeHTML(service.description)}</p>
-      <a class="service-link" href="${href}"${target}${rel}>${escapeHTML(linkLabel)} <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="service-link${linkClass}" href="${href}"${target}${rel}>${escapeHTML(linkLabel)} <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>`;
 }
 
